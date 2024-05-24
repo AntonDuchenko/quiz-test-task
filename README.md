@@ -1,30 +1,63 @@
-# React + TypeScript + Vite
+# Quiz Hub
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Quiz Hub is a dynamic and interactive quiz application built using React, TailwindCSS, Redux Toolkit, React Context, React Router, TW-elements, and Vite. This application allows users to take quizzes, create and edit quizzes, view a leaderboard, and complete quizzes within a timed session. LocalStorage is utilized for data persistence.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Take Quizzes:** Engage in various quizzes to test your knowledge.
+- **Create and Edit Quizzes:** Create your own quizzes and edit existing ones to keep the content fresh and challenging.
+- **Leaderboard:** Compete with others and view your ranking on the leaderboard.
+- **Persistent Storage:** All data is stored in LocalStorage, ensuring your progress and data are saved across sessions.
 
-## Expanding the ESLint configuration
+## Demo
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+Check out the live demo [here](https://antonduchenko.github.io/quiz-test-task/#/quizes).
 
-- Configure the top-level `parserOptions` property like this:
+## Tech Stack
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+- **React:** A JavaScript library for building user interfaces.
+- **TailwindCSS:** A utility-first CSS framework for rapid UI development.
+- **Redux Toolkit:** A set of tools to simplify Redux development.
+- **React Context:** A way to manage state globally.
+- **React Router:** Declarative routing for React applications.
+- **TW-elements:** A plugin library for TailwindCSS.
+- **Vite:** A fast and modern build tool for web projects.
+
+## Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/AntonDuchenko/quiz-test-task
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+Navigate to the project directory:
+
+```bash
+cd quiz-test-task
+```
+
+Install the dependencies:
+
+```bash
+npm install
+```
+
+Start the development server:
+
+```bash
+npm start
+```
+
+## Usage
+
+- **Taking Quizzes:** Select a quiz from the list and start answering the questions. Your score and time taken will be recorded.
+- **Creating a Quiz:** Navigate to the "Create Quiz" section, input your questions and answers, and save the quiz.
+- **Editing a Quiz:** Go to the "Edit Quiz" section, select the quiz you want to modify, make your changes, and save them.
+- **Viewing the Leaderboard:** Check the leaderboard to see the top scores and where you rank.
+
+## Contact
+
+If you have any questions or feedback, feel free to reach out at anton.duchenko2@gmail.com.
+
+Enjoy quizzing with Quiz Hub!
