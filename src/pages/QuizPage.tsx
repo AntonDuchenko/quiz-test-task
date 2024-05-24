@@ -22,7 +22,7 @@ export const QuizPage = () => {
       setSeconds(0);
       clearInterval(timer);
     };
-  }, []);
+  }, [setSeconds]);
 
   const [isChoosed, setIsChoosed] = useState(false);
 
