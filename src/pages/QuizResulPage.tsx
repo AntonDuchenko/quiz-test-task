@@ -1,10 +1,18 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { QuizContext } from "../context/quiz";
 import { useNavigate } from 'react-router-dom';
+import confetti from 'canvas-confetti';
 
 export const QuizResultPage = () => {
   const { score } = useContext(QuizContext);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    confetti({
+      particleCount: 100,
+      spread: 70,
+    });
+  }, []);
 
   return (
     <div className="flex items-center justify-center h-svh flex-col gap-10">

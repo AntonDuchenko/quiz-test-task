@@ -13,23 +13,27 @@ import { QuizContext } from "../../context/quiz";
 import { CreateButton } from "../CreateButton/CreateButton";
 import { v4 as uuidv4 } from "uuid";
 import deleteIcon from "../../assets/delete.svg";
+import { useAppDispatch, useAppSelector } from "../../app/reduxHooks";
+import * as questionsSlice from "../../features/questionsSlice";
 
 export const CreateQuestionModal = () => {
   const {
     setIsCreateQuestion,
     isCreateQuestion,
-    setQuestions,
-    questions,
     setIsCreateQuiz,
-    editingQuiz,
     setIsEditingQuiz,
-    editingQuestion,
   } = useContext(QuizContext);
 
   const [question, setQuestion] = useState("");
   const [option, setOption] = useState("");
   const [options, setOptions] = useState<string[]>([]);
   const [isCreateOption, setIsCreateOption] = useState(false);
+
+  const dispatch = useAppDispatch();
+  const { questions, editingQuestion } = useAppSelector(
+    (state) => state.questions
+  );
+  const editingQuiz = useAppSelector((state) => state.quizes.editingQuiz);
 
   useEffect(() => {
     if (editingQuestion) {
@@ -184,15 +188,17 @@ export const CreateQuestionModal = () => {
               <button
                 onClick={() => {
                   if (options.length >= 2) {
-                    setQuestions([
-                      ...questions,
-                      {
-                        id: uuidv4(),
-                        title: question,
-                        options,
-                        answer: "",
-                      },
-                    ]);
+                    dispatch(
+                      questionsSlice.setQuestions([
+                        ...questions,
+                        {
+                          id: uuidv4(),
+                          title: question,
+                          options,
+                          answer: "",
+                        },
+                      ])
+                    );
 
                     clearForm();
                     setIsCreateQuestion(false);

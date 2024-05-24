@@ -10,13 +10,17 @@ import deleteIcon from "../../assets/delete.svg";
 import { useContext } from "react";
 import { QuizContext } from "../../context/quiz";
 import { Quiz } from "../../types/Quiz";
+import { useAppDispatch, useAppSelector } from '../../app/reduxHooks';
+import * as quizesSlice from '../../features/quizesSlice';
 
 interface Props {
   quiz: Quiz;
 }
 
 export const DotsDropDown: React.FC<Props> = ({ quiz }) => {
-  const { setEditingQuiz, quizes, setQuizes, setIsEditingQuiz } = useContext(QuizContext);
+  const { setIsEditingQuiz } = useContext(QuizContext);
+  const dispatch = useAppDispatch();
+  const quizes = useAppSelector(state => state.quizes.quizes);
 
   return (
     <TEDropdown>
@@ -45,7 +49,7 @@ export const DotsDropDown: React.FC<Props> = ({ quiz }) => {
           <button
             onClick={() => {
               setIsEditingQuiz(true);
-              setEditingQuiz(quiz);
+              dispatch(quizesSlice.setEditingQuez(quiz));
             }}
             type="button"
             className="hover:bg-gray-300 w-full transition-all
@@ -60,7 +64,7 @@ export const DotsDropDown: React.FC<Props> = ({ quiz }) => {
           <button
             onClick={() => {
               const newQuizes = quizes.filter((q) => quiz.id !== q.id);
-              setQuizes(newQuizes);
+              dispatch(quizesSlice.setQuizes(newQuizes));
             }}
             type="button"
             className="hover:bg-gray-300 flex items-center px-4 py-2 gap-2

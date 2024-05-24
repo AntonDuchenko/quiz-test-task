@@ -1,9 +1,8 @@
-import { useContext } from 'react';
 import { QuizCard } from '../QuizCard/QuizCard';
-import { QuizContext } from '../../context/quiz';
+import { useAppSelector } from '../../app/reduxHooks';
 
 export const QuizBoard = () => {
-  const { quizes } = useContext(QuizContext);
+  const quizes = useAppSelector(state => state.quizes.quizes);
 
   return (
     <div

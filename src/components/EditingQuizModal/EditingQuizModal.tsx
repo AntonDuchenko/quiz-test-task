@@ -13,26 +13,26 @@ import { useContext, useEffect, useState } from "react";
 import { QuizContext } from "../../context/quiz";
 import editIcon from "../../assets/edit.svg";
 import deleteIcon from "../../assets/delete.svg";
+import { useAppDispatch, useAppSelector } from "../../app/reduxHooks";
+import * as quizesSlice from "../../features/quizesSlice";
+import * as questionsSlice from "../../features/questionsSlice";
 
 export const EditingQuizModal = () => {
   const {
-    editingQuiz,
-    setEditingQuiz,
     setIsCreateQuestion,
     isEditingQuiz,
     setIsEditingQuiz,
-    setQuizes,
-    quizes,
-    setQuestions,
-    questions,
-    setEditingQuestion,
   } = useContext(QuizContext);
+
+  const { quizes, editingQuiz } = useAppSelector((state) => state.quizes);
+  const questions = useAppSelector((state) => state.questions.questions);
+  const dispatch = useAppDispatch();
 
   const { id, title, duration, questions: editingQuestions } = editingQuiz!;
 
   useEffect(() => {
-    setQuestions(editingQuestions);
-  }, []);
+    dispatch(questionsSlice.setQuestions(editingQuestions));
+  }, [dispatch, editingQuestions]);
 
   const [newTitle, setNewTitle] = useState(title);
   const [newDuration, setNewDuration] = useState(duration.toString());
@@ -52,9 +52,9 @@ export const EditingQuizModal = () => {
                 type="button"
                 className="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
                 onClick={() => {
-                  setEditingQuiz(null);
                   setIsEditingQuiz(false);
-                  setQuestions([]);
+                  dispatch(quizesSlice.removeEditingQuez());
+                  dispatch(questionsSlice.resetQuestions());
                 }}
                 aria-label="Close"
               >
@@ -118,7 +118,7 @@ export const EditingQuizModal = () => {
                       <button
                         onClick={() => {
                           setIsEditingQuiz(false);
-                          setEditingQuestion(q);
+                          dispatch(questionsSlice.setEditingQuestion(q));
                           setIsCreateQuestion(true);
                         }}
                         type="button"
@@ -133,8 +133,11 @@ export const EditingQuizModal = () => {
 
                       <button
                         onClick={() => {
-                          setQuestions(
-                            questions.filter((question) => q.id !== question.id)
+                          const filteredQuestions = questions.filter(
+                            (question) => q.id !== question.id
+                          );
+                          dispatch(
+                            questionsSlice.setQuestions(filteredQuestions)
                           );
                         }}
                         type="button"
@@ -159,11 +162,11 @@ export const EditingQuizModal = () => {
                   className="inline-block rounded bg-slate-300 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal 
                 text-primary-700 transition-all hover:bg-slate-400 
                 focus:bg-slate-400 focus:outline-none focus:ring-0 active:bg-slate-400"
-                onClick={() => {
-                  setEditingQuiz(null);
-                  setIsEditingQuiz(false);
-                  setQuestions([]);
-                }}
+                  onClick={() => {
+                    setIsEditingQuiz(false);
+                    dispatch(quizesSlice.removeEditingQuez());
+                    dispatch(questionsSlice.resetQuestions());
+                  }}
                 >
                   Cancel
                 </button>
@@ -183,11 +186,11 @@ export const EditingQuizModal = () => {
                         : quiz
                     );
 
-                    setQuizes(newQuizes);
+                    dispatch(quizesSlice.setQuizes(newQuizes));
 
                     setIsEditingQuiz(false);
-                    setEditingQuiz(null);
-                    setQuestions([]);
+                    dispatch(quizesSlice.removeEditingQuez());
+                    dispatch(questionsSlice.resetQuestions());
                   }}
                   type="button"
                   className="ml-1 inline-block rounded bg-slate-600 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal 

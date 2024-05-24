@@ -14,18 +14,20 @@ import { CreateButton } from "../CreateButton/CreateButton";
 import { v4 as uuidv4 } from "uuid";
 import editIcon from "../../assets/edit.svg";
 import deleteIcon from "../../assets/delete.svg";
+import { useAppDispatch, useAppSelector } from "../../app/reduxHooks";
+import * as quizesSlice from "../../features/quizesSlice";
+import * as questionsSlice from "../../features/questionsSlice";
 
 export const CreateQuizModal = () => {
   const {
     isCreateQuiz,
     setIsCreateQuiz,
-    setQuizes,
-    quizes,
     setIsCreateQuestion,
-    questions,
-    setQuestions,
-    setEditingQuestion,
   } = useContext(QuizContext);
+
+  const quizes = useAppSelector((state) => state.quizes.quizes);
+  const questions = useAppSelector((state) => state.questions.questions);
+  const dispatch = useAppDispatch();
 
   const [title, setTitle] = useState("");
   const [duration, setDuration] = useState("");
@@ -47,7 +49,7 @@ export const CreateQuizModal = () => {
                   setTitle("");
                   setDuration("");
                   setIsCreateQuiz(false);
-                  setQuestions([]);
+                  dispatch(questionsSlice.resetQuestions());
                 }}
                 aria-label="Close"
               >
@@ -108,7 +110,7 @@ export const CreateQuizModal = () => {
                       <button
                         onClick={() => {
                           setIsCreateQuiz(false);
-                          setEditingQuestion(q);
+                          dispatch(questionsSlice.setEditingQuestion(q));
                           setIsCreateQuestion(true);
                         }}
                         type="button"
@@ -123,8 +125,11 @@ export const CreateQuizModal = () => {
 
                       <button
                         onClick={() => {
-                          setQuestions(
-                            questions.filter((question) => q.id !== question.id)
+                          const filteredQuestions = questions.filter(
+                            (question) => q.id !== question.id
+                          );
+                          dispatch(
+                            questionsSlice.setQuestions(filteredQuestions)
                           );
                         }}
                         type="button"
@@ -152,7 +157,7 @@ export const CreateQuizModal = () => {
                   onClick={() => {
                     setTitle("");
                     setDuration("");
-                    setQuestions([]);
+                    dispatch(questionsSlice.resetQuestions());
                   }}
                 >
                   Clear
@@ -162,17 +167,18 @@ export const CreateQuizModal = () => {
               <TERipple rippleColor="light">
                 <button
                   onClick={() => {
-                    if(questions.length > 0) {
-                      setQuizes([
-                        ...quizes,
-                        {
-                          id: uuidv4(),
-                          title,
-                          duration: +duration,
-                          questions,
-                        },
-                      ]);
-  
+                    if (questions.length > 0) {
+                      dispatch(
+                        quizesSlice.setQuizes([
+                          ...quizes,
+                          {
+                            id: uuidv4(),
+                            title,
+                            duration: +duration,
+                            questions,
+                          },
+                        ])
+                      );
                       setIsCreateQuiz(false);
                     }
                   }}

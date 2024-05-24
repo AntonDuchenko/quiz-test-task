@@ -1,12 +1,11 @@
-import { useContext } from "react";
-import { QuizContext } from "../context/quiz";
 import { useNavigate, useParams } from "react-router-dom";
 import { QuestionCard } from "../components/QuestionCard/QuestionCard";
 import arrowIcon from "../assets/right-arrow.svg";
+import { useAppSelector } from '../app/reduxHooks';
 
 export const QuizPage = () => {
   const { quizId, questionId } = useParams();
-  const { quizes } = useContext(QuizContext);
+  const quizes = useAppSelector(state => state.quizes.quizes);
   const navigate = useNavigate();
 
   const choosedQuiz = quizes.find((quiz) => quiz.id === quizId!);
