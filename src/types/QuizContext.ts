@@ -7,4 +7,6 @@ export type QuizContextType = {
   isEditingQuiz: boolean;
   score: number;
   setScore: React.Dispatch<React.SetStateAction<number>>;
+  seconds: number;
+  setSeconds: React.Dispatch<React.SetStateAction<number>>;
 };

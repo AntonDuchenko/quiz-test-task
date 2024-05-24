@@ -2,12 +2,27 @@ import { useNavigate, useParams } from "react-router-dom";
 import { QuestionCard } from "../components/QuestionCard/QuestionCard";
 import arrowIcon from "../assets/right-arrow.svg";
 import { useAppSelector } from "../app/reduxHooks";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { QuizContext } from "../context/quiz";
+import { formatTime } from "../utils/formatTimer";
+import classNames from "classnames";
 
 export const QuizPage = () => {
   const { quizId, questionId } = useParams();
+  const { seconds, setSeconds } = useContext(QuizContext);
   const quizes = useAppSelector((state) => state.quizes.quizes);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setSeconds((currSeconds) => currSeconds + 1);
+    }, 1000);
+
+    return () => {
+      setSeconds(0);
+      clearInterval(timer);
+    };
+  }, []);
 
   const [isChoosed, setIsChoosed] = useState(false);
 
@@ -28,7 +43,10 @@ export const QuizPage = () => {
   return (
     <div className="flex flex-col gap-5">
       <h2 className="text-3xl font-bold py-2">{title}</h2>
-      <p className="text-xl font-semibold">{`Question ${currentIndex} of ${questions.length}:`}</p>
+      <div className="flex justify-between">
+        <p className="text-xl font-semibold">{`Question ${currentIndex} of ${questions.length}:`}</p>
+        <p>{formatTime(seconds)}</p>
+      </div>
 
       <QuestionCard
         key={question?.id}
@@ -46,7 +64,10 @@ export const QuizPage = () => {
         }}
         disabled={!isChoosed}
         type="button"
-        className="bg-green-600 flex justify-center items-center rounded-lg max-w-[150px] h-9 text-white"
+        className={classNames(
+          "bg-green-600 flex justify-center items-center rounded-lg max-w-[150px] h-9 text-white",
+          { "bg-gray-500": !isChoosed }
+        )}
       >
         {isFinished ? (
           "Finish quiz"

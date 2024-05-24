@@ -10,6 +10,8 @@ export const QuizContext = createContext<QuizContextType>({
   setIsEditingQuiz: () => {},
   score: 0,
   setScore: () => {},
+  seconds: 0,
+  setSeconds: () => {},
 });
 
 interface Props {
@@ -21,6 +23,7 @@ export const QuizProvider: React.FC<Props> = ({ children }) => {
   const [isCreateQuestion, setIsCreateQuestion] = useState(false);
   const [isEditingQuiz, setIsEditingQuiz] = useState(false);
   const [score, setScore] = useState(0);
+  const [seconds, setSeconds] = useState(0);
 
   const preparedValue = useMemo(
     () => ({
@@ -32,12 +35,15 @@ export const QuizProvider: React.FC<Props> = ({ children }) => {
       setIsEditingQuiz,
       score,
       setScore,
+      seconds,
+      setSeconds
     }),
     [
       isCreateQuiz,
       isCreateQuestion,
       isEditingQuiz,
-      score
+      score,
+      seconds,
     ]
   );
 
