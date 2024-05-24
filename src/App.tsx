@@ -14,7 +14,7 @@ function App() {
   }, [dispatch]);
 
   return (
-    <div className="container m-auto h-svh">
+    <div className="container m-auto h-svh px-2">
       <HashRouter>
         <Routes>
           <Route path="/" element={<Navigate to="/quizes" />} />

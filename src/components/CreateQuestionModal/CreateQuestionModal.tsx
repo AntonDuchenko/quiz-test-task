@@ -8,6 +8,7 @@ import {
   TEModalFooter,
   TEModalHeader,
   TERipple,
+  TESelect,
 } from "tw-elements-react";
 import { QuizContext } from "../../context/quiz";
 import { CreateButton } from "../CreateButton/CreateButton";
@@ -15,6 +16,7 @@ import { v4 as uuidv4 } from "uuid";
 import deleteIcon from "../../assets/delete.svg";
 import { useAppDispatch, useAppSelector } from "../../app/reduxHooks";
 import * as questionsSlice from "../../features/questionsSlice";
+import { SelectData } from "tw-elements-react/dist/types/forms/Select/types";
 
 export const CreateQuestionModal = () => {
   const {
@@ -27,6 +29,8 @@ export const CreateQuestionModal = () => {
   const [question, setQuestion] = useState("");
   const [option, setOption] = useState("");
   const [options, setOptions] = useState<string[]>([]);
+  const [answer, setAnswer] = useState("");
+  const [points, setPoints] = useState(1);
   const [isCreateOption, setIsCreateOption] = useState(false);
 
   const dispatch = useAppDispatch();
@@ -39,6 +43,7 @@ export const CreateQuestionModal = () => {
     if (editingQuestion) {
       setQuestion(editingQuestion.title);
       setOptions(editingQuestion.options);
+      setAnswer(editingQuestion.answer);
     }
   }, [editingQuestion]);
 
@@ -48,7 +53,17 @@ export const CreateQuestionModal = () => {
     setOptions([]);
   };
 
+  const handlerOnSelectAnswer = (event: SelectData[] | SelectData) =>
+    setAnswer(Array.isArray(event) ? event[0].text! : event.text!);
+
   const optionCount = options.length + 1;
+  const data = options.map((option, index) => {
+    return {
+      text: option,
+      value: index + 1,
+    };
+  });
+  const value = data.find((opt) => opt.text === answer)?.value || 1;
 
   return (
     <TEModal show={isCreateQuestion} setShow={() => {}}>
@@ -64,6 +79,7 @@ export const CreateQuestionModal = () => {
               className="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
               onClick={() => {
                 setIsCreateQuestion(false);
+                dispatch(questionsSlice.removeEditingQuestion());
 
                 if (editingQuiz) {
                   setIsEditingQuiz(true);
@@ -100,6 +116,29 @@ export const CreateQuestionModal = () => {
               type="text"
               label="Question"
               value={question}
+            />
+
+            {options.length >= 2 && (
+              <div className="flex justify-center">
+                <div className="relative mb-3 w-full pt-5">
+                  <TESelect
+                    value={value}
+                    data={data}
+                    label="Answer"
+                    onValueChange={handlerOnSelectAnswer}
+                  />
+                </div>
+              </div>
+            )}
+
+            <TEInput
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setPoints(+e.target.value)
+              }
+              type="number"
+              id="exampleFormControlInputNumber"
+              label="Points per question(Optional)"
+              defaultValue={points}
             />
 
             {isCreateOption ? (
@@ -144,7 +183,7 @@ export const CreateQuestionModal = () => {
                 <ul className="flex flex-col gap-1 overflow-auto max-h-[200px]">
                   {options.map((option) => (
                     <li
-                      className="border-solid border-2 rounded-md px-3 py-1 flex justify-between items-center overflow-hidden"
+                      className="border-solid border-2 shrink-0 rounded-md px-3 py-1 flex justify-between items-center overflow-hidden"
                       key={option}
                     >
                       {option}
@@ -188,27 +227,44 @@ export const CreateQuestionModal = () => {
               <button
                 onClick={() => {
                   if (options.length >= 2) {
-                    dispatch(
-                      questionsSlice.setQuestions([
-                        ...questions,
-                        {
-                          id: uuidv4(),
-                          title: question,
-                          options,
-                          answer: "",
-                        },
-                      ])
+                    const isEditing = questions.find(
+                      (q) => q.id === editingQuestion?.id
                     );
 
-                    clearForm();
-                    setIsCreateQuestion(false);
-                    setIsCreateQuiz(true);
+                    const updatedQuestions = isEditing
+                      ? questions.map((q) =>
+                          q.id === editingQuestion?.id
+                            ? {
+                                id: editingQuestion.id,
+                                title: question,
+                                options,
+                                points,
+                                answer,
+                              }
+                            : q
+                        )
+                      : [
+                          ...questions,
+                          {
+                            id: uuidv4(),
+                            title: question,
+                            options,
+                            points,
+                            answer,
+                          },
+                        ];
+
+                    dispatch(questionsSlice.setQuestions(updatedQuestions));
 
                     if (editingQuiz) {
                       setIsEditingQuiz(true);
                     } else {
                       setIsCreateQuiz(true);
                     }
+
+                    clearForm();
+                    dispatch(questionsSlice.removeEditingQuestion());
+                    setIsCreateQuestion(false);
                   }
                 }}
                 type="button"

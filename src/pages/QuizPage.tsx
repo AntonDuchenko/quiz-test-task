@@ -1,12 +1,15 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { QuestionCard } from "../components/QuestionCard/QuestionCard";
 import arrowIcon from "../assets/right-arrow.svg";
-import { useAppSelector } from '../app/reduxHooks';
+import { useAppSelector } from "../app/reduxHooks";
+import { useState } from "react";
 
 export const QuizPage = () => {
   const { quizId, questionId } = useParams();
-  const quizes = useAppSelector(state => state.quizes.quizes);
+  const quizes = useAppSelector((state) => state.quizes.quizes);
   const navigate = useNavigate();
+
+  const [isChoosed, setIsChoosed] = useState(false);
 
   const choosedQuiz = quizes.find((quiz) => quiz.id === quizId!);
   const { title, questions } = choosedQuiz!;
@@ -27,16 +30,21 @@ export const QuizPage = () => {
       <h2 className="text-3xl font-bold py-2">{title}</h2>
       <p className="text-xl font-semibold">{`Question ${currentIndex} of ${questions.length}:`}</p>
 
-      <QuestionCard question={question!} key={question?.id} />
+      <QuestionCard
+        key={question?.id}
+        question={question!}
+        setIsChoosed={setIsChoosed}
+      />
 
       <button
         onClick={() => {
           if (!isFinished) {
             navigate(`./${questionIdActive()}`);
           } else {
-            navigate("/finish")
+            navigate("/finish");
           }
         }}
+        disabled={!isChoosed}
         type="button"
         className="bg-green-600 flex justify-center items-center rounded-lg max-w-[150px] h-9 text-white"
       >

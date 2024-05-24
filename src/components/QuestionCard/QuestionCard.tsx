@@ -1,22 +1,26 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Question } from "../../types/Question";
 import classNames from "classnames";
 import { QuizContext } from "../../context/quiz";
 
 interface Props {
   question: Question;
+  setIsChoosed: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const QuestionCard: React.FC<Props> = ({ question }) => {
-  const { title, options, answer } = question;
+export const QuestionCard: React.FC<Props> = ({ question, setIsChoosed }) => {
+  const { title, options, answer, points } = question;
   const { setScore } = useContext(QuizContext);
   const [choosedAnswer, setChoosedAnswer] = useState<string | null>(null);
+
+  useEffect(() => setIsChoosed(false), [setIsChoosed]);
 
   const handleOptionClick = (option: string) => {
     if (!choosedAnswer) {
       setChoosedAnswer(option);
+
       if (option === answer) {
-        setScore((prevScore) => prevScore + 1);
+        setScore((currentScore) => currentScore + points);
       }
     }
   };
@@ -44,7 +48,10 @@ export const QuestionCard: React.FC<Props> = ({ question }) => {
               <button
                 disabled={!!choosedAnswer}
                 className="w-full text-start px-4 py-2"
-                onClick={() => handleOptionClick(option)}
+                onClick={() => {
+                  handleOptionClick(option);
+                  setIsChoosed(true);
+                }}
               >
                 {option}
               </button>
