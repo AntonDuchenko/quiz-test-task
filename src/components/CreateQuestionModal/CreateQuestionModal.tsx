@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   TEInput,
   TEModal,
@@ -12,20 +12,37 @@ import {
 import { QuizContext } from "../../context/quiz";
 import { CreateButton } from "../CreateButton/CreateButton";
 import { v4 as uuidv4 } from "uuid";
+import deleteIcon from "../../assets/delete.svg";
 
 export const CreateQuestionModal = () => {
-  const { setIsCreateQuestion, isCreateQuestion, setQuestions, questions, setIsCreateQuiz } = useContext(QuizContext);
+  const {
+    setIsCreateQuestion,
+    isCreateQuestion,
+    setQuestions,
+    questions,
+    setIsCreateQuiz,
+    editingQuiz,
+    setIsEditingQuiz,
+    editingQuestion,
+  } = useContext(QuizContext);
 
   const [question, setQuestion] = useState("");
   const [option, setOption] = useState("");
   const [options, setOptions] = useState<string[]>([]);
   const [isCreateOption, setIsCreateOption] = useState(false);
 
+  useEffect(() => {
+    if (editingQuestion) {
+      setQuestion(editingQuestion.title);
+      setOptions(editingQuestion.options);
+    }
+  }, [editingQuestion]);
+
   const clearForm = () => {
     setQuestion("");
     setOption("");
     setOptions([]);
-  }
+  };
 
   const optionCount = options.length + 1;
 
@@ -41,7 +58,17 @@ export const CreateQuestionModal = () => {
             <button
               type="button"
               className="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
-              onClick={() => setIsCreateQuestion(false)}
+              onClick={() => {
+                setIsCreateQuestion(false);
+
+                if (editingQuiz) {
+                  setIsEditingQuiz(true);
+                } else {
+                  setIsCreateQuiz(true);
+                }
+
+                clearForm();
+              }}
               aria-label="Close"
             >
               <svg
@@ -75,13 +102,14 @@ export const CreateQuestionModal = () => {
               <form
                 onSubmit={(e) => {
                   const isExist = options.find((opt) => opt === option);
+                  e.preventDefault();
+
                   if (isExist) {
                     console.log("Already exist");
 
                     return;
                   }
 
-                  e.preventDefault();
                   setOptions(() => [...options, option]);
                   setOption("");
                   setIsCreateOption(false);
@@ -108,14 +136,27 @@ export const CreateQuestionModal = () => {
 
             {options.length > 0 && (
               <>
-                <h5>Options</h5>
+                <h5 className="text-2xl text-center">Options</h5>
                 <ul className="flex flex-col gap-1 overflow-auto max-h-[200px]">
                   {options.map((option) => (
                     <li
-                      className="border-solid border-2 rounded-md px-3 py-1"
+                      className="border-solid border-2 rounded-md px-3 py-1 flex justify-between items-center overflow-hidden"
                       key={option}
                     >
                       {option}
+                      <button
+                        onClick={() => {
+                          setOptions(options.filter((opt) => opt !== option));
+                        }}
+                        type="button"
+                        className="hover:bg-slate-300 transition-all p-2 rounded-lg"
+                      >
+                        <img
+                          src={deleteIcon}
+                          alt="delete-icon"
+                          className="w-[20px]"
+                        />
+                      </button>
                     </li>
                   ))}
                 </ul>
@@ -142,16 +183,27 @@ export const CreateQuestionModal = () => {
             <TERipple rippleColor="light">
               <button
                 onClick={() => {
-                  setQuestions([...questions, {
-                    id: uuidv4(),
-                    title: question,
-                    options,
-                    answer: "",
-                  }]);
+                  if (options.length >= 2) {
+                    setQuestions([
+                      ...questions,
+                      {
+                        id: uuidv4(),
+                        title: question,
+                        options,
+                        answer: "",
+                      },
+                    ]);
 
-                  clearForm();
-                  setIsCreateQuestion(false);
-                  setIsCreateQuiz(true);
+                    clearForm();
+                    setIsCreateQuestion(false);
+                    setIsCreateQuiz(true);
+
+                    if (editingQuiz) {
+                      setIsEditingQuiz(true);
+                    } else {
+                      setIsCreateQuiz(true);
+                    }
+                  }
                 }}
                 type="button"
                 className="ml-1 inline-block rounded bg-slate-600 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal 

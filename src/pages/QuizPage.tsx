@@ -25,14 +25,17 @@ export const QuizPage = () => {
 
   return (
     <div className="flex flex-col gap-5">
-      <h2 className="text-3xl font-bold">{title}</h2>
+      <h2 className="text-3xl font-bold py-2">{title}</h2>
       <p className="text-xl font-semibold">{`Question ${currentIndex} of ${questions.length}:`}</p>
 
       <QuestionCard question={question!} key={question?.id} />
+
       <button
         onClick={() => {
           if (!isFinished) {
             navigate(`./${questionIdActive()}`);
+          } else {
+            navigate("/finish")
           }
         }}
         type="button"

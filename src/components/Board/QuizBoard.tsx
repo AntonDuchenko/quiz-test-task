@@ -4,7 +4,6 @@ import { QuizContext } from '../../context/quiz';
 
 export const QuizBoard = () => {
   const { quizes } = useContext(QuizContext);
-  console.log(quizes);
 
   return (
     <div

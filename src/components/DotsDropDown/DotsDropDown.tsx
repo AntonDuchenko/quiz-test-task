@@ -7,16 +7,16 @@ import {
 } from "tw-elements-react";
 import editIcon from "../../assets/edit.svg";
 import deleteIcon from "../../assets/delete.svg";
-import { useContext } from 'react';
-import { QuizContext } from '../../context/quiz';
-import { Quiz } from '../../types/Quiz';
+import { useContext } from "react";
+import { QuizContext } from "../../context/quiz";
+import { Quiz } from "../../types/Quiz";
 
 interface Props {
   quiz: Quiz;
 }
 
 export const DotsDropDown: React.FC<Props> = ({ quiz }) => {
-  const {setEditingQuiz, quizes, setQuizes} = useContext(QuizContext);
+  const { setEditingQuiz, quizes, setQuizes, setIsEditingQuiz } = useContext(QuizContext);
 
   return (
     <TEDropdown>
@@ -43,7 +43,10 @@ export const DotsDropDown: React.FC<Props> = ({ quiz }) => {
       <TEDropdownMenu className="w-full !min-w-[200px]">
         <TEDropdownItem>
           <button
-            onClick={() => setEditingQuiz(quiz)}
+            onClick={() => {
+              setIsEditingQuiz(true);
+              setEditingQuiz(quiz);
+            }}
             type="button"
             className="hover:bg-gray-300 w-full transition-all
               bg-gray-200 flex items-center gap-2 px-4 py-2"
@@ -56,7 +59,7 @@ export const DotsDropDown: React.FC<Props> = ({ quiz }) => {
         <TEDropdownItem>
           <button
             onClick={() => {
-              const newQuizes = quizes.filter(q => quiz.id !== q.id);
+              const newQuizes = quizes.filter((q) => quiz.id !== q.id);
               setQuizes(newQuizes);
             }}
             type="button"

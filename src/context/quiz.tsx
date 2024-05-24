@@ -2,7 +2,7 @@ import { createContext, useEffect, useMemo, useState } from "react";
 import { QuizContextType } from "../types/QuizContext";
 import { Quiz } from "../types/Quiz";
 import { getQuizes } from "../api/quizes";
-import { Question } from '../types/Question';
+import { Question } from "../types/Question";
 
 export const QuizContext = createContext<QuizContextType>({
   isCreateQuiz: false,
@@ -15,6 +15,12 @@ export const QuizContext = createContext<QuizContextType>({
   setIsCreateQuestion: () => {},
   questions: [],
   setQuestions: () => {},
+  isEditingQuiz: false,
+  setIsEditingQuiz: () => {},
+  editingQuestion: null,
+  setEditingQuestion: () => {},
+  score: 0,
+  setScore: () => {},
 });
 
 interface Props {
@@ -27,14 +33,13 @@ export const QuizProvider: React.FC<Props> = ({ children }) => {
   const [editingQuiz, setEditingQuiz] = useState<Quiz | null>(null);
   const [isCreateQuestion, setIsCreateQuestion] = useState(false);
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [isEditingQuiz, setIsEditingQuiz] = useState(false);
+  const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
+  const [score, setScore] = useState(0);
 
   useEffect(() => {
     getQuizes().then(setQuizes);
   }, []);
-
-  // useEffect(() => {
-  //   localStorage.setItem("quizes", JSON.stringify(quizes));
-  // }, [quizes]);
 
   const preparedValue = useMemo(
     () => ({
@@ -47,9 +52,24 @@ export const QuizProvider: React.FC<Props> = ({ children }) => {
       isCreateQuestion,
       setIsCreateQuestion,
       questions,
-      setQuestions
+      setQuestions,
+      isEditingQuiz,
+      setIsEditingQuiz,
+      editingQuestion,
+      setEditingQuestion,
+      score,
+      setScore,
     }),
-    [isCreateQuiz, quizes, editingQuiz, isCreateQuestion, questions]
+    [
+      isCreateQuiz,
+      quizes,
+      editingQuiz,
+      isCreateQuestion,
+      questions,
+      isEditingQuiz,
+      editingQuestion,
+      score
+    ]
   );
 
   return (
