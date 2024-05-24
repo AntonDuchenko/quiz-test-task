@@ -16,13 +16,12 @@ import deleteIcon from "../../assets/delete.svg";
 import { useAppDispatch, useAppSelector } from "../../app/reduxHooks";
 import * as quizesSlice from "../../features/quizesSlice";
 import * as questionsSlice from "../../features/questionsSlice";
+import { Question } from "../../types/Question";
+import { toastSuccess } from "../../utils/toastSuccess";
 
 export const EditingQuizModal = () => {
-  const {
-    setIsCreateQuestion,
-    isEditingQuiz,
-    setIsEditingQuiz,
-  } = useContext(QuizContext);
+  const { setIsCreateQuestion, isEditingQuiz, setIsEditingQuiz } =
+    useContext(QuizContext);
 
   const { quizes, editingQuiz } = useAppSelector((state) => state.quizes);
   const questions = useAppSelector((state) => state.questions.questions);
@@ -37,25 +36,79 @@ export const EditingQuizModal = () => {
   const [newTitle, setNewTitle] = useState(title);
   const [newDuration, setNewDuration] = useState(duration.toString());
 
+  const handleOnClose = () => {
+    setIsEditingQuiz(false);
+    dispatch(quizesSlice.removeEditingQuez());
+    dispatch(questionsSlice.resetQuestions());
+  };
+
+  const handleOnChangeQuizTitle = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setNewTitle(e.target.value);
+
+  const handleOnChangeQuizDuration = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setNewDuration(e.target.value);
+
+  const handleOnClickCreate = () => {
+    setIsEditingQuiz(false);
+    setIsCreateQuestion(true);
+  };
+
+  const handleOnEdit = (q: Question) => {
+    setIsEditingQuiz(false);
+    dispatch(questionsSlice.setEditingQuestion(q));
+    setIsCreateQuestion(true);
+  };
+
+  const handleOnDelete = (q: Question) => {
+    const filteredQuestions = questions.filter(
+      (question) => q.id !== question.id
+    );
+    dispatch(questionsSlice.setQuestions(filteredQuestions));
+
+    toastSuccess(`Question ${q.title} deleted!`);
+  };
+
+  const handleOnCancelClick = () => {
+    setIsEditingQuiz(false);
+    dispatch(quizesSlice.removeEditingQuez());
+    dispatch(questionsSlice.resetQuestions());
+  };
+
+  const handleOnSave = () => {
+    const newQuizes = quizes.map((quiz) =>
+      quiz.id === id
+        ? {
+            id,
+            title: newTitle,
+            duration: +newDuration,
+            questions,
+          }
+        : quiz
+    );
+
+    dispatch(quizesSlice.setQuizes(newQuizes));
+
+    setIsEditingQuiz(false);
+    dispatch(quizesSlice.removeEditingQuez());
+    dispatch(questionsSlice.resetQuestions());
+
+    toastSuccess(`Quiz ${newTitle} updated!`);
+  };
+
   return (
     <div>
       <TEModal show={isEditingQuiz} setShow={setIsEditingQuiz} staticBackdrop>
         <TEModalDialog>
           <TEModalContent>
             <TEModalHeader>
-              {/* <!--Modal title--> */}
               <h5 className="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200">
                 Create new Quiz
               </h5>
-              {/* <!--Close button--> */}
+
               <button
                 type="button"
                 className="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
-                onClick={() => {
-                  setIsEditingQuiz(false);
-                  dispatch(quizesSlice.removeEditingQuez());
-                  dispatch(questionsSlice.resetQuestions());
-                }}
+                onClick={handleOnClose}
                 aria-label="Close"
               >
                 <svg
@@ -77,9 +130,7 @@ export const EditingQuizModal = () => {
 
             <TEModalBody className="flex flex-col gap-3">
               <TEInput
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setNewTitle(e.target.value)
-                }
+                onChange={handleOnChangeQuizTitle}
                 required
                 type="text"
                 id="exampleFormControlInput1"
@@ -88,9 +139,7 @@ export const EditingQuizModal = () => {
               />
 
               <TEInput
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setNewDuration(e.target.value)
-                }
+                onChange={handleOnChangeQuizDuration}
                 required
                 type="number"
                 id="exampleFormControlInputNumber"
@@ -99,10 +148,7 @@ export const EditingQuizModal = () => {
               />
 
               <CreateButton
-                onClick={() => {
-                  setIsEditingQuiz(false);
-                  setIsCreateQuestion(true);
-                }}
+                onClick={handleOnClickCreate}
                 title="Create question"
               />
 
@@ -116,11 +162,7 @@ export const EditingQuizModal = () => {
                     {q.title}
                     <div>
                       <button
-                        onClick={() => {
-                          setIsEditingQuiz(false);
-                          dispatch(questionsSlice.setEditingQuestion(q));
-                          setIsCreateQuestion(true);
-                        }}
+                        onClick={() => handleOnEdit(q)}
                         type="button"
                         className="hover:bg-slate-300 transition-all p-2 rounded-lg"
                       >
@@ -132,14 +174,7 @@ export const EditingQuizModal = () => {
                       </button>
 
                       <button
-                        onClick={() => {
-                          const filteredQuestions = questions.filter(
-                            (question) => q.id !== question.id
-                          );
-                          dispatch(
-                            questionsSlice.setQuestions(filteredQuestions)
-                          );
-                        }}
+                        onClick={() => handleOnDelete(q)}
                         type="button"
                         className="hover:bg-slate-300 transition-all p-2 rounded-lg"
                       >
@@ -162,11 +197,7 @@ export const EditingQuizModal = () => {
                   className="inline-block rounded bg-slate-300 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal 
                 text-primary-700 transition-all hover:bg-slate-400 
                 focus:bg-slate-400 focus:outline-none focus:ring-0 active:bg-slate-400"
-                  onClick={() => {
-                    setIsEditingQuiz(false);
-                    dispatch(quizesSlice.removeEditingQuez());
-                    dispatch(questionsSlice.resetQuestions());
-                  }}
+                  onClick={handleOnCancelClick}
                 >
                   Cancel
                 </button>
@@ -174,24 +205,7 @@ export const EditingQuizModal = () => {
 
               <TERipple rippleColor="light">
                 <button
-                  onClick={() => {
-                    const newQuizes = quizes.map((quiz) =>
-                      quiz.id === id
-                        ? {
-                            id,
-                            title: newTitle,
-                            duration: +newDuration,
-                            questions,
-                          }
-                        : quiz
-                    );
-
-                    dispatch(quizesSlice.setQuizes(newQuizes));
-
-                    setIsEditingQuiz(false);
-                    dispatch(quizesSlice.removeEditingQuez());
-                    dispatch(questionsSlice.resetQuestions());
-                  }}
+                  onClick={handleOnSave}
                   type="button"
                   className="ml-1 inline-block rounded bg-slate-600 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal 
                 text-white shadow-[0_4px_9px_-4px_#3b71ca] transition-all

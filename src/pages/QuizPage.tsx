@@ -18,10 +18,7 @@ export const QuizPage = () => {
       setSeconds((currSeconds) => currSeconds + 1);
     }, 1000);
 
-    return () => {
-      setSeconds(0);
-      clearInterval(timer);
-    };
+    return () => clearInterval(timer);
   }, [setSeconds]);
 
   const [isChoosed, setIsChoosed] = useState(false);
@@ -36,6 +33,14 @@ export const QuizPage = () => {
     const question = questions[currentIndex];
 
     return question.id;
+  };
+
+  const handleOnClick = () => {
+    if (!isFinished) {
+      navigate(`./${questionIdActive()}`);
+    } else {
+      navigate("/finish");
+    }
   };
 
   const isFinished = currentIndex === questions.length;
@@ -55,18 +60,12 @@ export const QuizPage = () => {
       />
 
       <button
-        onClick={() => {
-          if (!isFinished) {
-            navigate(`./${questionIdActive()}`);
-          } else {
-            navigate("/finish");
-          }
-        }}
+        onClick={handleOnClick}
         disabled={!isChoosed}
         type="button"
         className={classNames(
           "bg-green-600 flex justify-center items-center rounded-lg max-w-[150px] h-9 text-white",
-          { "bg-gray-500": !isChoosed }
+          { "!bg-gray-500": !isChoosed }
         )}
       >
         {isFinished ? (

@@ -19,6 +19,12 @@ export const BoardHeader = () => {
     }
   }, 1000);
 
+  const handleOnChangeQuery = (e: React.ChangeEvent<HTMLInputElement>) => {
+    debouncedSetSearchParams(e.target.value);
+  };
+
+  const handleOnCreateClick = () => setIsCreateQuiz(true);
+
   return (
     <div className="h-[60px] flex justify-between py-[10px] border-b-black border-b">
       <div className="flex gap-6 items-center">
@@ -27,9 +33,7 @@ export const BoardHeader = () => {
         </h1>
 
         <TEInput
-          onChange={(e) => {
-            debouncedSetSearchParams(e.target.value);
-          }}
+          onChange={handleOnChangeQuery}
           type="text"
           id="exampleFormControlInputText"
           label="Search quiz"
@@ -38,7 +42,7 @@ export const BoardHeader = () => {
 
       <div className="flex gap-2">
         <button
-          onClick={() => setIsCreateQuiz(true)}
+          onClick={handleOnCreateClick}
           type="button"
           className="max-h-[40px] min-w-[50px] sm:min-w-[180px] w-full border flex flex-row gap-2 justify-center items-center
         border-solid rounded-lg bg-slate-600 text-white hover:bg-slate-800 transition-all"

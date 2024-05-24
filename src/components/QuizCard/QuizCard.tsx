@@ -12,16 +12,20 @@ export const QuizCard: React.FC<Props> = ({ quiz }) => {
 
   const firstQuestion = questions[0].id;
 
+  const handleOnOptionClick = () =>
+    navigation(`/quizes/${id}/${firstQuestion}`);
+
   return (
     <section className="border-solid border-2 rounded-lg flex flex-col gap-4 p-3 max-w-[200px] w-full hover:scale-[1.1] transition-all">
       <div className="flex flex-col gap-3">
         <div className="flex justify-between w-full">
           <button
-            onClick={() => navigation(`/quizes/${id}/${firstQuestion}`)}
+            onClick={handleOnOptionClick}
             className="font-medium text-2xl"
           >
             {title}
           </button>
+
           <DotsDropDown quiz={quiz} />
         </div>
 

@@ -17,13 +17,13 @@ import deleteIcon from "../../assets/delete.svg";
 import { useAppDispatch, useAppSelector } from "../../app/reduxHooks";
 import * as quizesSlice from "../../features/quizesSlice";
 import * as questionsSlice from "../../features/questionsSlice";
+import { Question } from "../../types/Question";
+import { toastError } from "../../utils/toastError";
+import { toastSuccess } from "../../utils/toastSuccess";
 
 export const CreateQuizModal = () => {
-  const {
-    isCreateQuiz,
-    setIsCreateQuiz,
-    setIsCreateQuestion,
-  } = useContext(QuizContext);
+  const { isCreateQuiz, setIsCreateQuiz, setIsCreateQuestion } =
+    useContext(QuizContext);
 
   const quizes = useAppSelector((state) => state.quizes.quizes);
   const questions = useAppSelector((state) => state.questions.questions);
@@ -31,6 +31,64 @@ export const CreateQuizModal = () => {
 
   const [title, setTitle] = useState("");
   const [duration, setDuration] = useState("");
+
+  const handleOnCloseModal = () => {
+    setTitle("");
+    setDuration("");
+    setIsCreateQuiz(false);
+    dispatch(questionsSlice.resetQuestions());
+  };
+
+  const handleOnQuizTitleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setTitle(e.target.value);
+
+  const handleOnDurationChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setDuration(e.target.value);
+
+  const handleOnCreateQuestionClick = () => {
+    setIsCreateQuiz(false);
+    setIsCreateQuestion(true);
+  };
+
+  const handleOnEditingQuestion = (question: Question) => {
+    setIsCreateQuiz(false);
+    dispatch(questionsSlice.setEditingQuestion(question));
+    setIsCreateQuestion(true);
+  };
+
+  const handleOnDeleteQuestion = (q: Question) => {
+    const filteredQuestions = questions.filter(
+      (question) => q.id !== question.id
+    );
+    dispatch(questionsSlice.setQuestions(filteredQuestions));
+  };
+
+  const handleOnClearForm = () => {
+    setTitle("");
+    setDuration("");
+    dispatch(questionsSlice.resetQuestions());
+  };
+
+  const handleOnSave = () => {
+    if (questions.length > 0) {
+      dispatch(
+        quizesSlice.setQuizes([
+          ...quizes,
+          {
+            id: uuidv4(),
+            title,
+            duration: +duration,
+            questions,
+          },
+        ])
+      );
+      setIsCreateQuiz(false);
+
+      toastSuccess(`Quiz ${title} created!`);
+    } else {
+      toastError("To create quiz must be more than 1 question!");
+    }
+  };
 
   return (
     <div>
@@ -45,12 +103,7 @@ export const CreateQuizModal = () => {
               <button
                 type="button"
                 className="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
-                onClick={() => {
-                  setTitle("");
-                  setDuration("");
-                  setIsCreateQuiz(false);
-                  dispatch(questionsSlice.resetQuestions());
-                }}
+                onClick={handleOnCloseModal}
                 aria-label="Close"
               >
                 <svg
@@ -72,9 +125,7 @@ export const CreateQuizModal = () => {
 
             <TEModalBody className="flex flex-col gap-3">
               <TEInput
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setTitle(e.target.value)
-                }
+                onChange={handleOnQuizTitleChange}
                 type="text"
                 id="exampleFormControlInput1"
                 label="Quiz title"
@@ -82,9 +133,7 @@ export const CreateQuizModal = () => {
               />
 
               <TEInput
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setDuration(e.target.value)
-                }
+                onChange={handleOnDurationChange}
                 type="number"
                 id="exampleFormControlInputNumber"
                 label="Duration(in minutes)"
@@ -92,10 +141,7 @@ export const CreateQuizModal = () => {
               />
 
               <CreateButton
-                onClick={() => {
-                  setIsCreateQuiz(false);
-                  setIsCreateQuestion(true);
-                }}
+                onClick={handleOnCreateQuestionClick}
                 title="Create question"
               />
 
@@ -108,11 +154,7 @@ export const CreateQuizModal = () => {
                     {q.title}
                     <div>
                       <button
-                        onClick={() => {
-                          setIsCreateQuiz(false);
-                          dispatch(questionsSlice.setEditingQuestion(q));
-                          setIsCreateQuestion(true);
-                        }}
+                        onClick={() => handleOnEditingQuestion(q)}
                         type="button"
                         className="hover:bg-slate-300 transition-all p-2 rounded-lg"
                       >
@@ -124,14 +166,7 @@ export const CreateQuizModal = () => {
                       </button>
 
                       <button
-                        onClick={() => {
-                          const filteredQuestions = questions.filter(
-                            (question) => q.id !== question.id
-                          );
-                          dispatch(
-                            questionsSlice.setQuestions(filteredQuestions)
-                          );
-                        }}
+                        onClick={() => handleOnDeleteQuestion(q)}
                         type="button"
                         className="hover:bg-slate-300 transition-all p-2 rounded-lg"
                       >
@@ -154,11 +189,7 @@ export const CreateQuizModal = () => {
                   className="inline-block rounded bg-slate-300 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal 
                   text-primary-700 transition-all hover:bg-slate-400 
                   focus:bg-slate-400 focus:outline-none focus:ring-0 active:bg-slate-400"
-                  onClick={() => {
-                    setTitle("");
-                    setDuration("");
-                    dispatch(questionsSlice.resetQuestions());
-                  }}
+                  onClick={handleOnClearForm}
                 >
                   Clear
                 </button>
@@ -166,22 +197,7 @@ export const CreateQuizModal = () => {
 
               <TERipple rippleColor="light">
                 <button
-                  onClick={() => {
-                    if (questions.length > 0) {
-                      dispatch(
-                        quizesSlice.setQuizes([
-                          ...quizes,
-                          {
-                            id: uuidv4(),
-                            title,
-                            duration: +duration,
-                            questions,
-                          },
-                        ])
-                      );
-                      setIsCreateQuiz(false);
-                    }
-                  }}
+                  onClick={handleOnSave}
                   type="button"
                   className="ml-1 inline-block rounded bg-slate-600 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal 
                   text-white shadow-[0_4px_9px_-4px_#3b71ca] transition-all

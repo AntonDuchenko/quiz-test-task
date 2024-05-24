@@ -23,6 +23,8 @@ export const QuestionCard: React.FC<Props> = ({ question, setIsChoosed }) => {
         setScore((currentScore) => currentScore + points);
       }
     }
+
+    setIsChoosed(true);
   };
 
   return (
@@ -48,10 +50,7 @@ export const QuestionCard: React.FC<Props> = ({ question, setIsChoosed }) => {
               <button
                 disabled={!!choosedAnswer}
                 className="w-full text-start px-4 py-2"
-                onClick={() => {
-                  handleOptionClick(option);
-                  setIsChoosed(true);
-                }}
+                onClick={() => handleOptionClick(option)}
               >
                 {option}
               </button>

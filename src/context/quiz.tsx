@@ -36,15 +36,9 @@ export const QuizProvider: React.FC<Props> = ({ children }) => {
       score,
       setScore,
       seconds,
-      setSeconds
+      setSeconds,
     }),
-    [
-      isCreateQuiz,
-      isCreateQuestion,
-      isEditingQuiz,
-      score,
-      seconds,
-    ]
+    [isCreateQuiz, isCreateQuestion, isEditingQuiz, score, seconds]
   );
 
   return (

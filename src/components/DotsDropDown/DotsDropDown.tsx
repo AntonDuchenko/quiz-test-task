@@ -10,8 +10,9 @@ import deleteIcon from "../../assets/delete.svg";
 import { useContext } from "react";
 import { QuizContext } from "../../context/quiz";
 import { Quiz } from "../../types/Quiz";
-import { useAppDispatch, useAppSelector } from '../../app/reduxHooks';
-import * as quizesSlice from '../../features/quizesSlice';
+import { useAppDispatch, useAppSelector } from "../../app/reduxHooks";
+import * as quizesSlice from "../../features/quizesSlice";
+import { toastSuccess } from "../../utils/toastSuccess";
 
 interface Props {
   quiz: Quiz;
@@ -20,7 +21,19 @@ interface Props {
 export const DotsDropDown: React.FC<Props> = ({ quiz }) => {
   const { setIsEditingQuiz } = useContext(QuizContext);
   const dispatch = useAppDispatch();
-  const quizes = useAppSelector(state => state.quizes.quizes);
+  const quizes = useAppSelector((state) => state.quizes.quizes);
+
+  const handleOnEdit = () => {
+    setIsEditingQuiz(true);
+    dispatch(quizesSlice.setEditingQuez(quiz));
+  };
+
+  const handleOnDelete = () => {
+    const newQuizes = quizes.filter((q) => quiz.id !== q.id);
+    dispatch(quizesSlice.setQuizes(newQuizes));
+
+    toastSuccess(`Quiz ${quiz.title} deleted!`);
+  };
 
   return (
     <TEDropdown>
@@ -47,10 +60,7 @@ export const DotsDropDown: React.FC<Props> = ({ quiz }) => {
       <TEDropdownMenu className="w-full !min-w-[200px]">
         <TEDropdownItem>
           <button
-            onClick={() => {
-              setIsEditingQuiz(true);
-              dispatch(quizesSlice.setEditingQuez(quiz));
-            }}
+            onClick={handleOnEdit}
             type="button"
             className="hover:bg-gray-300 w-full transition-all
               bg-gray-200 flex items-center gap-2 px-4 py-2"
@@ -62,10 +72,7 @@ export const DotsDropDown: React.FC<Props> = ({ quiz }) => {
 
         <TEDropdownItem>
           <button
-            onClick={() => {
-              const newQuizes = quizes.filter((q) => quiz.id !== q.id);
-              dispatch(quizesSlice.setQuizes(newQuizes));
-            }}
+            onClick={handleOnDelete}
             type="button"
             className="hover:bg-gray-300 flex items-center px-4 py-2 gap-2
                text-[#ff0000] w-full bg-gray-200 transition-all"

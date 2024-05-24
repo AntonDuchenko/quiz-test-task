@@ -5,6 +5,7 @@ import { QuizResultPage } from "./pages/QuizResulPage";
 import { useEffect } from "react";
 import { useAppDispatch } from "./app/reduxHooks";
 import * as quizesSlice from "./features/quizesSlice";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -25,6 +26,8 @@ function App() {
           <Route path="finish" element={<QuizResultPage />} />
         </Routes>
       </HashRouter>
+
+      <ToastContainer newestOnTop />
     </div>
   );
 }

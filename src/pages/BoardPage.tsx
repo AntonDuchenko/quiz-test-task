@@ -15,7 +15,7 @@ export const BoardPage = () => {
     const newParams = new URLSearchParams(searchParams);
     newParams.delete("term");
     setSearchParams(newParams);
-  }, []);
+  }, [searchParams, setSearchParams]);
 
   return (
     <div>

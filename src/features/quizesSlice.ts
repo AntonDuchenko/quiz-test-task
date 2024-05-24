@@ -49,7 +49,8 @@ const QuizesSlice = createSlice({
 });
 
 export default QuizesSlice.reducer;
-export const { setQuizes, setEditingQuez, removeEditingQuez } = QuizesSlice.actions;
+export const { setQuizes, setEditingQuez, removeEditingQuez } =
+  QuizesSlice.actions;
 
 export const init = createAsyncThunk(
   "quizes/fetch",

@@ -17,6 +17,8 @@ import deleteIcon from "../../assets/delete.svg";
 import { useAppDispatch, useAppSelector } from "../../app/reduxHooks";
 import * as questionsSlice from "../../features/questionsSlice";
 import { SelectData } from "tw-elements-react/dist/types/forms/Select/types";
+import { toastError } from "../../utils/toastError";
+import { toastSuccess } from "../../utils/toastSuccess";
 
 export const CreateQuestionModal = () => {
   const {
@@ -65,6 +67,106 @@ export const CreateQuestionModal = () => {
   });
   const value = data.find((opt) => opt.text === answer)?.value || 1;
 
+  const handleOnModalClose = () => {
+    setIsCreateQuestion(false);
+    dispatch(questionsSlice.removeEditingQuestion());
+
+    if (editingQuiz) {
+      setIsEditingQuiz(true);
+    } else {
+      setIsCreateQuiz(true);
+    }
+
+    clearForm();
+  };
+
+  const handleOnChangeQuestionValue = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => setQuestion(e.target.value);
+
+  const handleOnChangePointsValue = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setPoints(+e.target.value);
+
+  const handleOnChangeOptionValue = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setOption(e.target.value);
+
+  const handleOnOptionInputSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const isExist = options.find((opt) => opt === option);
+    e.preventDefault();
+
+    if (isExist) {
+      toastError(`Option ${option} already exist! Let's create new!`);
+
+      return;
+    }
+
+    setOptions(() => [...options, option]);
+    setOption("");
+    setIsCreateOption(false);
+
+    toastSuccess(`Option ${option} created!`);
+  };
+
+  const handleOnCreateClickOption = () => {
+    setIsCreateOption(true);
+  };
+
+  const handleOnDeleteOption = () => {
+    setOptions(options.filter((opt) => opt !== option));
+
+    toastSuccess(`Option ${option} deleted!`);
+  };
+
+  const handleOnClearForm = () => {
+    clearForm();
+    setIsCreateOption(false);
+  };
+
+  const handleOnSaveQuestion = () => {
+    if (options.length >= 2) {
+      const isEditing = questions.find((q) => q.id === editingQuestion?.id);
+
+      const updatedQuestions = isEditing
+        ? questions.map((q) =>
+            q.id === editingQuestion?.id
+              ? {
+                  id: editingQuestion.id,
+                  title: question,
+                  options,
+                  points,
+                  answer,
+                }
+              : q
+          )
+        : [
+            ...questions,
+            {
+              id: uuidv4(),
+              title: question,
+              options,
+              points,
+              answer,
+            },
+          ];
+
+      dispatch(questionsSlice.setQuestions(updatedQuestions));
+
+      if (editingQuiz) {
+        setIsEditingQuiz(true);
+      } else {
+        setIsCreateQuiz(true);
+      }
+
+      clearForm();
+      dispatch(questionsSlice.removeEditingQuestion());
+      setIsCreateQuestion(false);
+
+      toastSuccess(`Question ${question} with options created!`);
+    } else {
+      toastError("To create quetion must be more than 2 options");
+    }
+  };
+
   return (
     <TEModal show={isCreateQuestion} setShow={() => {}}>
       <TEModalDialog>
@@ -77,18 +179,7 @@ export const CreateQuestionModal = () => {
             <button
               type="button"
               className="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none"
-              onClick={() => {
-                setIsCreateQuestion(false);
-                dispatch(questionsSlice.removeEditingQuestion());
-
-                if (editingQuiz) {
-                  setIsEditingQuiz(true);
-                } else {
-                  setIsCreateQuiz(true);
-                }
-
-                clearForm();
-              }}
+              onClick={handleOnModalClose}
               aria-label="Close"
             >
               <svg
@@ -110,9 +201,7 @@ export const CreateQuestionModal = () => {
 
           <TEModalBody className="flex flex-col gap-3">
             <TEInput
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setQuestion(e.target.value)
-              }
+              onChange={handleOnChangeQuestionValue}
               type="text"
               label="Question"
               value={question}
@@ -132,9 +221,7 @@ export const CreateQuestionModal = () => {
             )}
 
             <TEInput
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setPoints(+e.target.value)
-              }
+              onChange={handleOnChangePointsValue}
               type="number"
               id="exampleFormControlInputNumber"
               label="Points per question(Optional)"
@@ -142,26 +229,9 @@ export const CreateQuestionModal = () => {
             />
 
             {isCreateOption ? (
-              <form
-                onSubmit={(e) => {
-                  const isExist = options.find((opt) => opt === option);
-                  e.preventDefault();
-
-                  if (isExist) {
-                    console.log("Already exist");
-
-                    return;
-                  }
-
-                  setOptions(() => [...options, option]);
-                  setOption("");
-                  setIsCreateOption(false);
-                }}
-              >
+              <form onSubmit={handleOnOptionInputSubmit}>
                 <TEInput
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setOption(e.target.value)
-                  }
+                  onChange={handleOnChangeOptionValue}
                   autoFocus
                   type="text"
                   label={`Option ${optionCount}`}
@@ -170,9 +240,7 @@ export const CreateQuestionModal = () => {
               </form>
             ) : (
               <CreateButton
-                onClick={() => {
-                  setIsCreateOption(true);
-                }}
+                onClick={handleOnCreateClickOption}
                 title="Create option"
               />
             )}
@@ -188,9 +256,7 @@ export const CreateQuestionModal = () => {
                     >
                       {option}
                       <button
-                        onClick={() => {
-                          setOptions(options.filter((opt) => opt !== option));
-                        }}
+                        onClick={handleOnDeleteOption}
                         type="button"
                         className="hover:bg-slate-300 transition-all p-2 rounded-lg"
                       >
@@ -214,10 +280,7 @@ export const CreateQuestionModal = () => {
                 className="inline-block rounded bg-slate-300 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal 
                   text-primary-700 transition-all hover:bg-slate-400 
                   focus:bg-slate-400 focus:outline-none focus:ring-0 active:bg-slate-400"
-                onClick={() => {
-                  clearForm();
-                  setIsCreateOption(false);
-                }}
+                onClick={handleOnClearForm}
               >
                 Clear
               </button>
@@ -225,48 +288,7 @@ export const CreateQuestionModal = () => {
 
             <TERipple rippleColor="light">
               <button
-                onClick={() => {
-                  if (options.length >= 2) {
-                    const isEditing = questions.find(
-                      (q) => q.id === editingQuestion?.id
-                    );
-
-                    const updatedQuestions = isEditing
-                      ? questions.map((q) =>
-                          q.id === editingQuestion?.id
-                            ? {
-                                id: editingQuestion.id,
-                                title: question,
-                                options,
-                                points,
-                                answer,
-                              }
-                            : q
-                        )
-                      : [
-                          ...questions,
-                          {
-                            id: uuidv4(),
-                            title: question,
-                            options,
-                            points,
-                            answer,
-                          },
-                        ];
-
-                    dispatch(questionsSlice.setQuestions(updatedQuestions));
-
-                    if (editingQuiz) {
-                      setIsEditingQuiz(true);
-                    } else {
-                      setIsCreateQuiz(true);
-                    }
-
-                    clearForm();
-                    dispatch(questionsSlice.removeEditingQuestion());
-                    setIsCreateQuestion(false);
-                  }
-                }}
+                onClick={handleOnSaveQuestion}
                 type="button"
                 className="ml-1 inline-block rounded bg-slate-600 px-6 pb-2 pt-2.5 text-xs font-medium uppercase leading-normal 
                   text-white shadow-[0_4px_9px_-4px_#3b71ca] transition-all
