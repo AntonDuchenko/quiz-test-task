@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { useAppDispatch } from "./app/reduxHooks";
 import * as quizesSlice from "./features/quizesSlice";
 import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const dispatch = useAppDispatch();
