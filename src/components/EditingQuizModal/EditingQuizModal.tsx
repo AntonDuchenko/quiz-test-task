@@ -18,6 +18,7 @@ import * as quizesSlice from "../../features/quizesSlice";
 import * as questionsSlice from "../../features/questionsSlice";
 import { Question } from "../../types/Question";
 import { toastSuccess } from "../../utils/toastSuccess";
+import { toastError } from '../../utils/toastError';
 
 export const EditingQuizModal = () => {
   const { setIsCreateQuestion, isEditingQuiz, setIsEditingQuiz } =
@@ -75,24 +76,28 @@ export const EditingQuizModal = () => {
   };
 
   const handleOnSave = () => {
-    const newQuizes = quizes.map((quiz) =>
-      quiz.id === id
-        ? {
-            id,
-            title: newTitle,
-            duration: +newDuration,
-            questions,
-          }
-        : quiz
-    );
+    if (questions.length > 0) {
+      const newQuizes = quizes.map((quiz) =>
+        quiz.id === id
+          ? {
+              id,
+              title: newTitle,
+              duration: +newDuration,
+              questions,
+            }
+          : quiz
+      );
 
-    dispatch(quizesSlice.setQuizes(newQuizes));
+      dispatch(quizesSlice.setQuizes(newQuizes));
 
-    setIsEditingQuiz(false);
-    dispatch(quizesSlice.removeEditingQuez());
-    dispatch(questionsSlice.resetQuestions());
+      setIsEditingQuiz(false);
+      dispatch(quizesSlice.removeEditingQuez());
+      dispatch(questionsSlice.resetQuestions());
 
-    toastSuccess(`Quiz ${newTitle} updated!`);
+      toastSuccess(`Quiz ${newTitle} updated!`);
+    } else {
+      toastError("To update quiz must be more than 1 question!")
+    }
   };
 
   return (
