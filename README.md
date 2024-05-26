@@ -1,6 +1,6 @@
 # Quiz Hub
 
-Quiz Hub is a dynamic and interactive quiz application built using React, TailwindCSS, Redux Toolkit, React Context, React Router, TW-elements, and Vite. This application allows users to take quizzes, create and edit quizzes, view a leaderboard, and complete quizzes within a timed session. LocalStorage is utilized for data persistence.
+Quiz Hub is a dynamic and interactive quiz application built using React, TailwindCSS, Redux Toolkit, React Context, React Router, TW-elements, and Vite. This application allows users to take quizzes, create and edit quizzes, view a leaderboard, and complete quizzes within a timer. LocalStorage is utilized for data persistence.
 
 ## Features
 
